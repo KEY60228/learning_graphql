@@ -1,7 +1,21 @@
 module.exports = {
-    // 写真を格納した配列の長さを返す
-    totalPhotos: () => photos.length,
+    // 写真の数を返す
+    totalPhotos: (parent, args, { db }) => {
+        return db.collection('photos').estimateDocumentCount()
+    },
 
     // 全ての写真を返す
-    allPhotos: () => photos
+    allPhotos: (parent, args, { db }) => {
+        return db.collection('photos').find().toArray()
+    },
+
+    // ユーザー数を返す
+    totalUsers: (parent, args, { db }) => {
+        return db.collection('users').estimateDocumentCount()
+    },
+
+    // 全てのユーザーを返す
+    allUsers: (parent, args, { db }) => {
+        return db.collection('users').find().toArray()
+    }
 }
