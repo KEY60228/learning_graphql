@@ -1,5 +1,6 @@
 const fetch = require('node-fetch')
 const { authorizeWithGitHub } = require('../lib')
+require('dotenv').config()
 
 module.exports = {
     postPhoto(parent, args) {
@@ -43,9 +44,9 @@ module.exports = {
         }
 
         // 新しい情報をもとにレコードを追加したり更新する
-        const { ops:[user] } = await db.collection('users').replaceOne({ githubLogin: login }, latestUserInfo, { upsert: true })
+        await db.collection('users').replaceOne({ githubLogin: login }, latestUserInfo, { upsert: true })
 
         // ユーザーデータとトークンを返す
-        return { user, token: access_token }
+        return { user: latestUserInfo, token: access_token }
     }
 }

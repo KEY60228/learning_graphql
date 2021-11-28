@@ -17,5 +17,8 @@ module.exports = {
     // 全てのユーザーを返す
     allUsers: (parent, args, { db }) => {
         return db.collection('users').find().toArray()
-    }
+    },
+
+    // ログインしているユーザーの情報を返す
+    me: (parent, args, { currentUser }) => currentUser
 }

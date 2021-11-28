@@ -16,9 +16,16 @@ async function start() {
     // MongoDBクライアントのインスタンスを作成
     const client = await MongoClient.connect(MONGO_DB, { usenewUrlParser: true })
     const db = client.db()
-    const context = { db }
     // Apolloサーバーのインスタンスを作成
-    const server = new ApolloServer({ typeDefs, resolvers, context })
+    const server = new ApolloServer({
+        typeDefs,
+        resolvers,
+        context: async ({ req }) => {
+            const githubToken = req.headers.authorization
+            const currentUser = await db.collection('users').findOne({ githubToken })
+            return { db, currentUser }
+        }
+    })
 
     await server.start()
     // applyMiddleware()を呼び出し、Expressにミドルウェアを追加する
