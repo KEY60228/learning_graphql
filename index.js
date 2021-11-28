@@ -2,55 +2,9 @@ const { ApolloServer } = require(`apollo-server-express`)
 const { GraphQLScalarType } = require("graphql")
 const express = require(`express`)
 const expressPlayground = require('graphql-playground-middleware-express').default
+const { readFileSync } = require('fs')
 
-const typeDefs = `
-    scalar DateTime
-
-    enum PhotoCategory {
-        SELFIE
-        PORTRAIT
-        ACTION
-        LANDSCAPE
-        GRAPHIC
-    }
-
-    # Photo型を定義
-    type Photo {
-        id: ID!
-        url: String!
-        name: String!
-        description: String
-        category: PhotoCategory!
-        postedBy: User!
-        taggedUsers: [User!]!
-        created: DateTime!
-    }
-
-    # User型を定義
-    type User {
-        githubLogin: ID!
-        name: String
-        avatar: String
-        postedPhotos: [Photo!]!
-        inPhotos: [Photo!]!
-    }
-
-    input PostPhotoInput {
-        name: String!
-        category: PhotoCategory=PORTRAIT
-        description: String
-    }
-
-    # allPhotosはPhotoを返す
-    type Query {
-        totalPhotos: Int!
-        allPhotos(after: DateTime): [Photo!]!
-    }
-
-    type Mutation {
-        postPhoto(input: PostPhotoInput!): Photo!
-    }
-`
+const typeDefs = readFileSync('./typeDefs.graphql', 'utf-8')
 
 // ユニークIDをインクリメントするための変数
 var _id = 0
