@@ -1,7 +1,7 @@
 module.exports = {
     // 写真の数を返す
     totalPhotos: (parent, args, { db }) => {
-        return db.collection('photos').estimateDocumentCount()
+        return db.collection('photos').estimatedDocumentCount()
     },
 
     // 全ての写真を返す
@@ -11,7 +11,7 @@ module.exports = {
 
     // ユーザー数を返す
     totalUsers: (parent, args, { db }) => {
-        return db.collection('users').estimateDocumentCount()
+        return db.collection('users').estimatedDocumentCount()
     },
 
     // 全てのユーザーを返す
