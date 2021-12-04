@@ -6,7 +6,17 @@ import reportWebVitals from './reportWebVitals';
 import { ApolloProvider } from 'react-apollo'
 import ApolloClient, { gql } from 'apollo-boost'
 
-const client = new ApolloClient({ uri: 'http://localhost:4000/graphql' })
+const client = new ApolloClient({
+    uri: 'http://localhost:4000/graphql',
+    request: operation => {
+        operation.setContext(context => ({
+            headers: {
+                ...context.headers,
+                authorization: localStorage.getItem('token')
+            }
+        }))
+    }
+})
 
 const query = gql`
     {
