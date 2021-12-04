@@ -3,6 +3,7 @@ const { MongoClient } = require('mongodb')
 const express = require(`express`)
 const expressPlayground = require('graphql-playground-middleware-express').default
 const { readFileSync } = require('fs')
+const { createServer } = require('http')
 require('dotenv').config()
 
 const typeDefs = readFileSync('./typeDefs.graphql', 'utf-8')
@@ -27,7 +28,6 @@ async function start() {
         }
     })
 
-    await server.start()
     // applyMiddleware()を呼び出し、Expressにミドルウェアを追加する
     server.applyMiddleware({ app })
 
@@ -36,8 +36,15 @@ async function start() {
     // GraphQL Playground用ルート
     app.get('/playground', (expressPlayground({ endpoint: '/graphql' })))
 
+    // HTTPサーバー
+    const httpServer = createServer(app)
+    // WebSocketを動作させる
+    server.installSubscriptionHandlers(httpServer)
+
     // 特定のポートでlistenする
-    app.listen({ port: 4000}, () => console.log(`GraphQL Server running at https://localhost:4000${server.graphqlPath}`))
+    httpServer.listen({ port: 4000 }, () => {
+        console.log(`GraphQL Server running at https://localhost:4000${server.graphqlPath}`)
+    })
 }
 
 start()
