@@ -3,7 +3,7 @@ const { authorizeWithGitHub } = require('../lib')
 require('dotenv').config()
 
 module.exports = {
-    async postPhoto(parent, args, { db, currentUser }) {
+    async postPhoto(root, args, { db, currentUser, pubsub }) {
         // コンテキストにユーザーがいなければエラーを投げる
         if (!currentUser) {
             throw new Error('only an authorized user can post a photo')
@@ -19,6 +19,8 @@ module.exports = {
         // 新しいphotoを追加して、データベースが生成したIDを取得する
         const { insertedIds } = await db.collection('photos').insert(newPhoto)
         newPhoto.id = insertedIds[0]
+
+        pubsub.publish('photo-added', { newPhoto })
 
         return newPhoto
     },
