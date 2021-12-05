@@ -51,6 +51,8 @@ async function start() {
     const httpServer = createServer(app)
     // WebSocketを動作させる
     server.installSubscriptionHandlers(httpServer)
+    // タイムアウト設定
+    httpServer.timeout = 5000
 
     // 特定のポートでlistenする
     httpServer.listen({ port: 4000 }, () => {
