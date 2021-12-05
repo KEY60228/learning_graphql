@@ -25,7 +25,7 @@ module.exports = {
         return newPhoto
     },
 
-    async githubAuth(parent, { code }, { db }) {
+    async githubAuth(parent, { code }, { db, pubsub }) {
         // GitHubからデータを取得する
         let {
             message,
@@ -53,13 +53,15 @@ module.exports = {
         }
 
         // 新しい情報をもとにレコードを追加したり更新する
-        await db.collection('users').replaceOne({ githubLogin: login }, latestUserInfo, { upsert: true })
+        const {ops:[user], result} = await db.collection('users').replaceOne({ githubLogin: login }, latestUserInfo, { upsert: true })
+
+        result.upserted && pubsub.publish('user-added', {newUser: user})
 
         // ユーザーデータとトークンを返す
         return { user: latestUserInfo, token: access_token }
     },
 
-    async addFakeUsers(root, { count }, { db }) {
+    async addFakeUsers(root, { count }, { db, pubsub }) {
         var randomUserApi = `https://randomuser.me/api/?results=${count}`
 
         var { results } = await fetch(randomUserApi).then(res => res.json())
@@ -70,6 +72,9 @@ module.exports = {
             githubToken: r.login.sha1
         }))
         await db.collection('users').insert(users)
+
+        var newUsers = await db.collection('users').find().sort({_id: -1}).limit(count).toArray()
+        newUsers.forEach(newUser => pubsub.publish('user-added', {newUser}))
 
         return users
     },
