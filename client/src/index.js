@@ -4,12 +4,13 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { ApolloProvider } from 'react-apollo'
-import ApolloClient, { gql, InMemoryCache, HttpLink, ApolloLink, split } from 'apollo-boost'
+import ApolloClient, { gql, InMemoryCache, ApolloLink, split } from 'apollo-boost'
 import { persistCache } from 'apollo-cache-persist'
 import { WebSocketLink } from 'apollo-link-ws'
 import { getMainDefinition } from 'apollo-utilities'
+import { createUploadLink } from 'apollo-upload-client'
 
-const httpLink = new HttpLink({uri: 'http://localhost:4000/graphql'})
+const httpLink = new createUploadLink({uri: 'http://localhost:4000/graphql'})
 const wsLink = new WebSocketLink({
     uri: 'ws://localhost:4000/graphql',
     options: { reconnect: true }
