@@ -4,6 +4,7 @@ const express = require(`express`)
 const expressPlayground = require('graphql-playground-middleware-express').default
 const { readFileSync } = require('fs')
 const { createServer } = require('http')
+const path = require('path')
 require('dotenv').config()
 
 const typeDefs = readFileSync('./typeDefs.graphql', 'utf-8')
@@ -43,6 +44,8 @@ async function start() {
     app.get('/', (req, res) => res.end('Welcome to the PhotoShare API'))
     // GraphQL Playground用ルート
     app.get('/playground', (expressPlayground({ endpoint: '/graphql' })))
+
+    app.use('/img/photos', express.static(path.join(__dirname, 'assets', 'photos')))
 
     // HTTPサーバー
     const httpServer = createServer(app)

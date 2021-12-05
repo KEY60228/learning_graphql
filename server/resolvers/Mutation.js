@@ -1,5 +1,7 @@
 const fetch = require('node-fetch')
 const { authorizeWithGitHub } = require('../lib')
+const { uploadStream } = require('../lib')
+const path = require('path')
 require('dotenv').config()
 
 module.exports = {
@@ -20,9 +22,16 @@ module.exports = {
         const { insertedIds } = await db.collection('photos').insert(newPhoto)
         newPhoto.id = insertedIds[0]
 
-        pubsub.publish('photo-added', newPhoto)
+        var toPath = path.join(
+            __dirname, '..', 'assets', 'photos', `${photo.id}.jpg`
+        )
 
-        return newPhoto
+        const stream = await args.input.file
+        await uploadFile(input.file, toPath)
+
+        pubsub.publish('photo-added', {newPhoto: photo})
+
+        return photo
     },
 
     async githubAuth(parent, { code }, { db, pubsub }) {
