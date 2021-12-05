@@ -27,11 +27,11 @@ module.exports = {
         )
 
         const stream = await args.input.file
-        await uploadFile(input.file, toPath)
+        await uploadStream(stream, toPath)
 
-        pubsub.publish('photo-added', {newPhoto: photo})
+        pubsub.publish('photo-added', {newPhoto})
 
-        return photo
+        return newPhoto
     },
 
     async githubAuth(parent, { code }, { db, pubsub }) {
