@@ -15,6 +15,7 @@
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "graphql": "^15.7.2",
+    "graphql-depth-limit": "^1.1.0",
     "graphql-playground-middleware-express": "^1.7.23",
     "mongodb": "^4.2.0",
     "node-fetch": "^2.1.0",

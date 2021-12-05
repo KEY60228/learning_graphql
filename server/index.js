@@ -5,6 +5,7 @@ const expressPlayground = require('graphql-playground-middleware-express').defau
 const { readFileSync } = require('fs')
 const { createServer } = require('http')
 const path = require('path')
+const depthLimit = require('graphql-depth-limit')
 require('dotenv').config()
 
 const typeDefs = readFileSync('./typeDefs.graphql', 'utf-8')
@@ -26,6 +27,7 @@ async function start() {
     const server = new ApolloServer({
         typeDefs,
         resolvers,
+        validationRules: [depthLimit(5)],
         context: async ({ req, connection }) => {
             const githubToken = req ?
                 req.headers.authorization :
