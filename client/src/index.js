@@ -4,8 +4,34 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { ApolloProvider } from 'react-apollo'
-import ApolloClient, { gql, InMemoryCache } from 'apollo-boost'
+import ApolloClient, { gql, InMemoryCache, HttpLink, ApolloLink, split } from 'apollo-boost'
 import { persistCache } from 'apollo-cache-persist'
+import { WebSocketLink } from 'apollo-link-ws'
+import { getMainDefinition } from 'apollo-utilities'
+
+const httpLink = new HttpLink({uri: 'http://localhost:4000/graphql'})
+const wsLink = new WebSocketLink({
+    uri: 'ws://localhost:4000/graphql',
+    options: { reconnect: true }
+})
+const authLink = new ApolloLink((operation, forward) => {
+    operation.setContext(context => ({
+        headers: {
+            ...context.headers,
+            authorization: localStorage.getItem('token')
+        }
+    }))
+    return forward(operation)
+})
+const httpAuthLink = authLink.concat(httpLink)
+const link = split(
+    ({query}) => {
+        const {kind, operation } = getMainDefinition(query)
+        return kind === 'OperationDefinition' && operation === 'subscription'
+    },
+    wsLink,
+    httpAuthLink
+)
 
 const cache = new InMemoryCache()
 persistCache({
@@ -20,15 +46,7 @@ if (localStorage['apollo-cache-persist']) {
 
 const client = new ApolloClient({
     cache,
-    uri: 'http://localhost:4000/graphql',
-    request: operation => {
-        operation.setContext(context => ({
-            headers: {
-                ...context.headers,
-                authorization: localStorage.getItem('token')
-            }
-        }))
-    }
+    link
 })
 
 const query = gql`
