@@ -20,7 +20,7 @@ module.exports = {
         const { insertedIds } = await db.collection('photos').insert(newPhoto)
         newPhoto.id = insertedIds[0]
 
-        pubsub.publish('photo-added', { newPhoto })
+        pubsub.publish('photo-added', newPhoto)
 
         return newPhoto
     },
